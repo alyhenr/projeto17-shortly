@@ -13,7 +13,7 @@ export default (action, data) => {
                 name: Joi.string().required(),
                 email: Joi.string().email().required(),
                 password: Joi.string().min(3),
-                confirmPassword: Joi.string().min(3),
+                confirmPassword: Joi.string().required().valid(Joi.ref('password')),
             }).validate(data, { abortEarly: false });
         }
         default:
