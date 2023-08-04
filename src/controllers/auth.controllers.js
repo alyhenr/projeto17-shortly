@@ -1,6 +1,7 @@
 import UserService from "../services/UserService.js";
 
-const user = new UserService("users");
+const dbName = "users";
+const user = new UserService(dbName);
 
 export const signUp = async (req, res) => {
     const { name, email, password } = req.body;

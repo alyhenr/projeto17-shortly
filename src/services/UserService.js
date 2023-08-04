@@ -30,20 +30,15 @@ export default class UserService extends DbServices {
 
     /**
      *
-     * @param {email} param0 user's email
-     * @param {password} param1 user's password
+     * @param {String} email user's email
+     * @param {String} password user's password
      * @returns
      */
     async authenticateUser({ email, password }) {
-        const query = `
-            SELECT *
-            FROM ${this.dbName}
-            WHERE email=$1
-        `;
-        const user = (await db.query(query, [email])).rows[0];
+        const user = (await this.getConditionally("email", email)).rows[0];
 
         if (user.length === 0) return {
-            status: 404, message: "Email not found"
+            status: 401, message: "Email not found."
         }
 
         if (bcrypt.compareSync(password, user.password)) {
@@ -54,8 +49,6 @@ export default class UserService extends DbServices {
                 status: 401, message: "Password is wrong!"
             }
         }
-
-
     };
 
     async #createSession({ userId, token }) {

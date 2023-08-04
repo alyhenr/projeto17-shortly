@@ -25,14 +25,32 @@ export default class DbServices {
      * if not found, throws an error and return the rows that were not found in the data base object.
      */
     async getRows(rows = [...arguments]) {
-        const numberOfRows = rows.length;
         const query = `
             SELECT ${rows.map((_, i) => `$${i + 1}`).join(", ")}
-            FROM $${numberOfRows};
+            FROM ${this.dbName}};
         `;
         try {
             return await db.query(query, [rows, this.dbName]);
         } catch (error) {
+            throw new Error("Database doesn't exist or the connection was lost!", error);
+        }
+    }
+
+    /**
+     *
+     * @param {String} row name of the row which implies the condition to retrieve data
+     * @param {String} value the value to be searched for in the given row
+     */
+    async getConditionally(row, value) {
+        const query = `
+            SELECT *
+            FROM ${this.dbName}
+            WHERE ${row} = $1;
+        `;
+        try {
+            return await db.query(query, [value]);
+        } catch (error) {
+            console.log(error);
             throw new Error("Database doesn't exist or the connection was lost!", error);
         }
     }
