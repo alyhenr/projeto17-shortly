@@ -43,6 +43,12 @@ export default class UserService extends DbServices {
 
         if (bcrypt.compareSync(password, user.password)) {
             const token = this.#generateToken();
+            //Update last login of the user:
+            await db.query(`
+                UPDATE users SET lastlogin = NOW() WHERE email=$1;
+            `, [email]);
+
+            // Start new session:
             return this.#createSession({ userId: user.id, token });
         } else {
             return {
@@ -54,7 +60,7 @@ export default class UserService extends DbServices {
     async #createSession({ userId, token }) {
         const query = `
             INSERT INTO sessions
-            ("userId", token, "startedAt")
+            ("userId", token, "createdAt")
             VALUES ($1, $2, NOW())
         `;
 
