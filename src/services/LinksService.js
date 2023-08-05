@@ -14,6 +14,12 @@ export default class LinksService extends DbServices {
         this.#token = token;
     }
 
+    async isTokenValid() {
+        return (await db.query(`
+            SELECT 1 FROM sessions WHERE token = $1
+        `, [this.#token])).rowCount > 0;
+    }
+
     /**
      *
      * @param {String} originalLink url sent by the user, to be shortened
@@ -47,13 +53,29 @@ export default class LinksService extends DbServices {
         } catch (error) {
             console.log(error);
             return {
-                status: 500, message: "Internal error when shortening new url, try again..."
+                status: 500, message: "Internal error when shortening your new url, try again..."
             };
         }
     }
 
     #shortenUrl() {
         return nanoid();
+    }
+
+    async searchForUrl(shortUrl) {
+        const query = `
+            UPDATE ${this.dbName}
+            SET views = views + 1
+            WHERE "shortenedLink"=$1
+            RETURNING "originalLink"
+        `;
+
+        const originalLink = await db.query(query, [shortUrl]);
+        if (originalLink.rowCount === 0) {
+            return [false, undefined];
+        } else {
+            return [true, originalLink.rows[0]["originalLink"]];
+        }
     }
 
     /**
@@ -99,6 +121,86 @@ export default class LinksService extends DbServices {
             return {
                 status: 200, data: link.rows[0]
             }
+        }
+    }
+
+    async deleteLink(id) {
+        if (!(await this.isTokenValid())) {
+            return {
+                status: 401, message: "Token is not valid or the link belongs to another user."
+            };
+        }
+        const query = `
+            DELETE FROM ${this.dbName} as t1
+            USING sessions as t2
+            WHERE t1.id = $1
+            AND t2.token='${this.#token}';
+        `;
+        const response = await db.query(query, [id]);
+
+        if (response.rowCount === 0) {
+            return {
+                status: 404, message: "Url not found."
+            };
+        } else {
+            return {
+                status: 204
+            };
+        }
+    }
+
+    async getUserLinks() {
+        if (await this.isTokenValid()) {
+            const query = `
+                SELECT users.id, users.username as name, SUM(links.views)
+                AS "visitCount", JSON_AGG(JSON_BUILD_OBJECT(
+                    'id', links.id, 'shortUrl', links."shortenedLink", 'url', links."originalLink", 'visitCount', links.views
+                )) AS "shortenedUrls"
+                FROM users
+                JOIN sessions ON sessions.token = '${this.#token}'
+                JOIN links ON links."userId" = sessions."userId"
+                WHERE users.id = sessions."userId"
+                GROUP BY users.id, users.username;
+            `;
+
+            try {
+                const dbResponse = await db.query(query);
+                return {
+                    status: 200, data: dbResponse.rows[0],
+                }
+            } catch (error) {
+                console.log(error);
+                return {
+                    status: 500, message: "Internal error, try again in a while..."
+                };
+            }
+        } else {
+            return {
+                status: 401, message: "Token is not valid!"
+            };
+        }
+    }
+
+    async getByViewsCount() {
+        const query = `
+            SELECT users.id, users.username AS name, COUNT(links) as "linksCount", SUM(links.views) AS "visitCount"
+            FROM users
+            JOIN links ON links."userId" = users.id
+            GROUP BY users.id, users.username
+            ORDER BY "visitCount" DESC;
+        `;
+
+
+        try {
+            const dbResponse = await db.query(query);
+            return {
+                status: 200, data: dbResponse.rows
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                status: 500, message: "Internal error, try again in a while..."
+            };
         }
     }
 };
