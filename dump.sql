@@ -93,7 +93,7 @@ ALTER SEQUENCE public.sessions_id_seq OWNED BY public.sessions.id;
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    username character varying(20) NOT NULL,
+    username character varying(255) NOT NULL,
     password character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
     lastlogin timestamp without time zone,
@@ -147,14 +147,10 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 INSERT INTO public.links VALUES ('2023-08-04 11:56:59.156902', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'nCMkBiKUWD5CKOYsMsZ6h', 0, 7);
-INSERT INTO public.links VALUES ('2023-08-04 11:57:13.222867', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'gepQHdsPV3Oa2Wm69y51n', 0, 8);
 INSERT INTO public.links VALUES ('2023-08-04 11:57:28.825337', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'Mw4TFp2bjbtiAqejmtrKo', 0, 9);
-INSERT INTO public.links VALUES ('2023-08-04 11:58:46.390626', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'CnReC5SblxlY7wCwV02rl', 0, 11);
 INSERT INTO public.links VALUES ('2023-08-04 11:58:47.297773', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'yfnS86gh__0vL2dZKzuvQ', 0, 12);
 INSERT INTO public.links VALUES ('2023-08-04 11:58:57.525325', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'go4i4kfEGj-66KUZMLA8Q', 0, 13);
 INSERT INTO public.links VALUES ('2023-08-04 11:58:05.762303', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'c9jJkPLjXM3lOtDv6qCLZ', 4, 10);
-INSERT INTO public.links VALUES ('2023-08-04 11:52:17.199254', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', '7QXY40Nn90utrpTdHEO1T', 1, 4);
-INSERT INTO public.links VALUES ('2023-08-04 11:54:44.093348', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', 'QQ4u5k1zdWKA8yx7ChbLJ', 1, 5);
 INSERT INTO public.links VALUES ('2023-08-04 11:56:38.792933', 17, 8, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', '6NnE3sKciravQn0WJD1TI', 1, 6);
 INSERT INTO public.links VALUES ('2023-08-05 00:49:52.965132', 18, 9, 'https://www.notion.so/bootcampra/Projeto-17-Shortly-API-34ff4484a1274eed901c5a2bd1e23722', '3y1d8K3YKGac2JAgUSwzw', 9, 14);
 INSERT INTO public.links VALUES ('2023-08-05 01:01:23.528805', 18, 9, 'https://www.coursera.org/', 'zxOYbQ5np64ohmgBR1ryP', 0, 15);
@@ -185,6 +181,8 @@ INSERT INTO public.sessions VALUES ('39c209c2-b849-4910-aa4a-f1c2ce8ede5e', 19, 
 INSERT INTO public.users VALUES (17, 'João', '$2b$10$1M84EqXPgI2oQIxR5F/SyuRqsiYO83nTud/6Lh7L50SR1U/6C3xOK', 'joao@driven.com.br', NULL, '2023-08-03 19:07:13.753214');
 INSERT INTO public.users VALUES (18, 'Alissera', '$2b$10$2w6TvjLFIiMJDa8EwJcwVeoSXPiEnY8ZPozWcfyeQYfTfaJxDs4/m', 'alysson@driven.com.br', NULL, '2023-08-05 00:48:39.89373');
 INSERT INTO public.users VALUES (19, 'alyssonLindo', '$2b$10$sVkferUJcWylUut5OJ81Be2.pg6N0bmq621F8LDmhaCrwABjKdQw.', 'aly@driven.com.br', '2023-08-05 10:54:02.46255', '2023-08-05 01:02:25.484199');
+INSERT INTO public.users VALUES (20, 'Felícia', '$2b$10$A20LB0xl4fUwxIeZPVKVW..4xms4Sl5fHbL/Dl8ktE0z5GSbzapyC', 'yuri_Souza@live.com', NULL, '2023-08-05 11:23:16.158389');
+INSERT INTO public.users VALUES (22, 'Felícia Albuquerque Filho', '$2b$10$1/saY.XIxOipbEgJWvCN6OgwxmQp9nMZAYG9qhoE/UmjbaCfeWBLe', 'yuri@live.com', NULL, '2023-08-05 11:25:26.981876');
 
 
 --
@@ -205,7 +203,7 @@ SELECT pg_catalog.setval('public.sessions_id_seq', 12, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 19, true);
+SELECT pg_catalog.setval('public.users_id_seq', 22, true);
 
 
 --
