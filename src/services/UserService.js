@@ -36,8 +36,7 @@ export default class UserService extends DbServices {
      */
     async authenticateUser({ email, password }) {
         const user = (await this.getConditionally("email", email)).rows[0];
-
-        if (user.length === 0) return {
+        if (!user) return {
             status: 401, message: "Email not found."
         }
 

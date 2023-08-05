@@ -199,18 +199,24 @@ export default class LinksService extends DbServices {
         }
     }
 
-    async getByViewsCount() {
+    /**
+     *
+     * @param {Number} limit (optional) limits the number of objects returned (default = 10)
+     * @returns An array of objects with the user's data (id and name) and their number of links and total of views
+     */
+    async getByViewsCount(limit = 10) {
         const query = `
             SELECT users.id, users.username AS name, COUNT(links) as "linksCount", SUM(links.views) AS "visitCount"
             FROM users
             JOIN links ON links."userId" = users.id
             GROUP BY users.id, users.username
-            ORDER BY "visitCount" DESC;
+            ORDER BY "visitCount" DESC
+            LIMIT $1;
         `;
 
 
         try {
-            const dbResponse = await db.query(query);
+            const dbResponse = await db.query(query, [limit]);
             return {
                 status: 200, data: dbResponse.rows
             }
