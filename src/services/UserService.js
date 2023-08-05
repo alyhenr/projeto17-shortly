@@ -11,7 +11,6 @@ export default class UserService extends DbServices {
 
     async createUser({ name: username, email, password }) {
         const hash = bcrypt.hashSync(password, 10);
-
         const query = `
             INSERT INTO ${this.dbName}
             (username, email, password, lastlogin, "createdAt")
@@ -21,6 +20,7 @@ export default class UserService extends DbServices {
             await db.query(query, [username, email, hash]);
             return { message: "User created", status: 201, data: { username, email, hash } };
         } catch (error) {
+            console.log(error);
             return error.detail?.includes("already exists") ? {
                 status: 409,
                 message: error.detail,

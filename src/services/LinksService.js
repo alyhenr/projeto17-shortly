@@ -16,8 +16,14 @@ export default class LinksService extends DbServices {
 
     async isTokenValid() {
         return (await db.query(`
-            SELECT 1 FROM sessions WHERE token = $1
+            SELECT 1 FROM sessions WHERE token = $1;
         `, [this.#token])).rowCount > 0;
+    }
+
+    async isLinkValid(id) {
+        return (await db.query(`
+            SELECT 1 FROM ${this.dbName} WHERE id=$1;
+        `, [id])).rowCount > 0;
     }
 
     /**
@@ -127,20 +133,32 @@ export default class LinksService extends DbServices {
     async deleteLink(id) {
         if (!(await this.isTokenValid())) {
             return {
-                status: 401, message: "Token is not valid or the link belongs to another user."
+                status: 401, message: "Token is not valid!"
             };
         }
+
+        if (!(await this.isLinkValid(id))) {
+            return {
+                status: 404, message: "Link not found."
+            };
+        }
+
         const query = `
             DELETE FROM ${this.dbName} as t1
             USING sessions as t2
             WHERE t1.id = $1
-            AND t2.token='${this.#token}';
+            AND t2."userId" = t1."userId"
+            AND t2.token = '${this.#token}'
+            RETURNING EXISTS(
+                SELECT 1 FROM ${this.dbName} WHERE id=$1
+            );
         `;
         const response = await db.query(query, [id]);
 
         if (response.rowCount === 0) {
+            console.log(response);
             return {
-                status: 404, message: "Url not found."
+                status: 401, message: "Url belongs to another user!"
             };
         } else {
             return {
